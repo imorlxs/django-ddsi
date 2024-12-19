@@ -22,4 +22,10 @@ urlpatterns = [
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
     
+    path('dar_de_alta_campana/', views.dar_de_alta_campana, name='dar_de_alta_campana'),
+    path('modificar_campana/<int:campaign_id>/', views.modificar_campana, name='modificar_campana'),
+    path('listar_campanas/', views.listar_campanas, name='marketing_lista_campanas'),
+    path('eliminar_campana/<int:campaign_id>/', views.eliminar_campana, name='eliminar_campana'),
+
 ]
+
