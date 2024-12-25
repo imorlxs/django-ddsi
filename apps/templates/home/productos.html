@@ -1,0 +1,142 @@
+{% extends "layouts/base.html" %}
+{% block title %} UI Tables {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+
+<div class="row">
+<!-- Barra de búsqueda -->
+
+<!-- Productos -->
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h4 class="card-title">Productos</h4>
+      <p class="card-category">Listado de todos los productos</p>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+          <form method="get" action="{% url 'productos' %}" class="form-inline">
+            <input type="text" class="form-control" name="search" placeholder="Buscar Producto..." value="{{ request.GET.search }}">
+            <button type="submit" class="btn btn-primary ml-2">Buscar</button>
+          </form>
+        </div>
+              <div class="d-flex">
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addProductoModal">
+            Añadir Producto
+          </button>
+        </div>      
+      </div>
+      
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead class="text-primary">
+            <th class="text-center">ID Producto</th>
+            <th>Nombre Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Tallas</th>
+            <th>Proveedor</th>
+            <th class="text-right">Acciones</th>
+          </thead>
+          <tbody>
+            {% for producto in productos %}
+            <tr>
+              <td class="text-center">{{ producto.ID_producto }}</td>
+              <td>{{ producto.nombre_producto }}</td>
+              <td>{{ producto.cantidad }}</td>
+              <td>&euro; {{ producto.precio }}</td>
+              <td>{{ producto.tallas }}</td>
+              <td>{{ producto.proveedor }}</td>
+              <td class="td-actions text-right">
+                <button type="button" class="btn btn-success btn-round" data-toggle="modal" data-target="#editProductoModal" id="editButton" data-id="{{ producto.ID_producto }}">
+                    <i class="material-icons">edit</i>
+                  </button>
+                <form action="{% url 'eliminar_producto' producto.ID_producto %}" method="post" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-round">
+                    <i class="material-icons">close</i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar Producto -->
+<div class="modal" id="addProductoModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Añadir Producto</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ producto_form }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" name="add_producto">Guardar Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar Producto -->
+<div class="modal" id="editProductoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Producto</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {{ producto_form }}
+            <input type="hidden" id="producto_id" name="producto_id" value="">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" name="edit_producto">Confirmar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+    $('#editButton').on('click', function () {
+    // Obtener el ID del producto desde el atributo data-id del botón
+    var idProducto = $(this).data('id');
+    
+    // Asignar el valor al campo oculto del formulario
+    $('#producto_id').val(idProducto);
+    
+    // Opcional: Si quieres llenar otros campos del formulario, también puedes hacerlo
+    // $('#nombreProducto').val(someValue);
+});
+
+</script>
+
+{% endblock javascripts %}
