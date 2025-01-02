@@ -17,6 +17,12 @@ from .forms import IngresoForm, GastoForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
+
+
+from .forms import EmpleadoForm
+from .models import Empleado
+
+
 def contabilidad_view(request):
       # Calcular la suma de los ingresos
     total_ingresos = Ingreso.objects.all().aggregate(total=Sum('monto_ingreso'))['total'] or 0
@@ -175,3 +181,36 @@ def pages(request):
     
     
 
+
+
+def registrar_empleado(request,action,empleado_id=None):
+    if action == 'listar':
+        empleados = Empleado.objects.all()
+        return render(request,'empleados/empleados.html',{'action':'listar','empleados':empleados})
+    elif action == 'registrar':
+        if request.method == 'POST':
+            form = EmpleadoForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('empleado',action='listar')
+        else:
+            form = EmpleadoForm()
+        return render(request,'empleados/empleados.html',{'action': 'registrar', 'form': form})
+    
+    elif action == 'modificar':
+        empleado = get_object_or_404(Empleado,id=empleado_id)
+        if request.method == 'POST':
+            form=EmpleadoForm(request.POST, instance=empleado)
+            if form.is_valid():
+                form.save()
+                return redirect('empleado', action='listar')
+        else:
+            form = EmpleadoForm(instance=empleado)
+        return render(request,'empleados/empleados.html',{'action': 'modificar', 'form': form,'empleado': empleado})
+    elif action == 'consultar':
+        empleado = get_object_or_404(Empleado,id=empleado_id)
+        return render(request,'empleados/empleados.html',{'action':'consultar', 'empleado':empleado})
+    elif action == 'eliminar':
+        empleado = get_object_or_404(Empleado,id=empleado_id)
+        empleado.delete()
+        return redirect('empleado',action='listar')

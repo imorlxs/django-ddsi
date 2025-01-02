@@ -1,0 +1,64 @@
+{% extends 'registro_personas/base.html' %}
+
+{% block title %}
+    {% if action == 'listar' %}Lista de Empleados{% endif %}
+    {% if action == 'registrar' %}Registrar Empleado{% endif %}
+    {% if action == 'modificar' %}Modificar Empleado{% endif %}
+    {% if action == 'consultar' %}Detalles del Empleado{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if action == 'listar' %}
+        <h2>Lista de Empleados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Puesto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                <tr>
+                    <td>{{ empleado.nombre }}</td>
+                    <td>{{ empleado.apellido }}</td>
+                    <td>{{ empleado.puesto }}</td>
+                    <td>
+                        <a href="{% url 'empleado' action='consultar' empleado_id=empleado.id %}">Ver</a>
+                        <a href="{% url 'empleado' action='modificar' empleado_id=empleado.id %}">Editar</a>
+                        <a href="{% url 'empleado' action='eliminar' empleado_id=empleado.id %}" onclick="return confirm('¿Estás seguro de eliminar este empleado?')">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'empleado' action='registrar' %}">Registrar Nuevo Empleado</a>
+    {% endif %}
+
+    {% if action == 'registrar' or action == 'modificar' %}
+        <h2>{% if action == 'registrar' %}Registrar{% else %}Modificar{% endif %} Empleado</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">{% if action == 'registrar' %}Registrar{% else %}Guardar Cambios{% endif %}</button>
+        </form>
+        <a href="{% url 'empleado' action='listar' %}">Cancelar</a>
+    {% endif %}
+
+    {% if action == 'consultar' %}
+        <h2>Detalles del Empleado</h2>
+        <ul>
+            <li>Nombre: {{ empleado.nombre }}</li>
+            <li>Apellido: {{ empleado.apellido }}</li>
+            <li>DNI: {{ empleado.dni }}</li>
+            <li>Teléfono: {{ empleado.telefono }}</li>
+            <li>Email: {{ empleado.email }}</li>
+            <li>Puesto: {{ empleado.puesto }}</li>
+            <li>Fecha de Contratación: {{ empleado.fecha_contratacion }}</li>
+            <li>Fecha de Nacimiento: {{ empleado.fecha_nacimiento }}</li>
+        </ul>
+        <a href="{% url 'empleado' action='listar' %}">Volver</a>
+    {% endif %}
+{% endblock %}

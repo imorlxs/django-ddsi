@@ -6,7 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
+from .models import Empleado
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -58,3 +58,24 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+
+
+class EmpleadoForm(forms.ModelForm):
+    class Meta:
+        model = Empleado
+        fields = ['nombre', 'apellido', 'dni', 'email','telefono','cargo', 'fecha_nacimiento','direccion', 'fecha_contratacion']
+        widgets = {
+            'fecha_contratacion': forms.DateInput(attrs={'type':'date'}),
+            'fecha_nacimiento': forms.DateInput(attrs={'type':'date'}),
+        }
+        labels = {
+            'nombre': 'Nombre',
+            'apellido': 'Apellido',
+            'dni': 'DNI',
+            'email': 'Email',
+            'telefono': 'Telefono',
+            'cargo': 'Puesto de trabajo',
+            'fecha_contratacion': 'Fecha de contratacion',
+            'fecha_nacimiento': 'Fecha de nacimiento',
+
+        }
