@@ -121,6 +121,36 @@
 
 </div>
 
+<!--Modala para el restock -- !>
+<div class="row">
+  <! -- Aviso de restock -->
+  {% if productos_sin_stock %}
+  <div class="col-md-12">
+    <div class="alert alert-warning">
+      <h4 class="alert-heading">Aviso de Restock</h4>
+      <p>Los siguientes productos necesitan restock:</p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID Producto</th>
+            <th>Nombre Producto</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for producto in productos_sin_stock %}
+          <tr>
+            <td>{{ producto.ID_producto }}</td>
+            <td>{{ producto.nombre_producto }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
@@ -136,6 +166,8 @@
     // Opcional: Si quieres llenar otros campos del formulario, también puedes hacerlo
     // $('#nombreProducto').val(someValue);
 });
+
+
 
 </script>
 

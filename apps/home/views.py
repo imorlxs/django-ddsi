@@ -13,12 +13,15 @@ from django.db.models import Sum
 # Modelos DDSI
 from .models import Ingreso  
 from .models import Gasto 
-from .forms import IngresoForm, GastoForm
+from .forms import IngresoForm, GastoForm, ProductoForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
+#producto
+from .models import Producto
+
 def contabilidad_view(request):
-      # Calcular la suma de los ingresos
+    # Calcular la suma de los ingresos
     total_ingresos = Ingreso.objects.all().aggregate(total=Sum('monto_ingreso'))['total'] or 0
 
     # Calcular la suma de los gastos
@@ -139,6 +142,68 @@ def eliminar_gasto(request, gasto_id):
 
     return redirect('contabilidad')  # Redirige a la vista de contabilidad
 
+
+#productos
+#editado para aniadir el restock
+@login_required(login_url="/login/")
+def productos_view(request):
+    # BUSCAR PRODUCTOS
+    search_query = request.GET.get('search', '')
+    if search_query:
+        productos = Producto.objects.filter(ID_producto__icontains=search_query)
+    else:
+        productos = Producto.objects.all()
+
+    # Productos con cantidad = 0 para el aviso de restock
+    productos_sin_stock = Producto.objects.filter(cantidad=0)
+
+    context = {
+        'productos': productos,
+        'productos_sin_stock': productos_sin_stock,  # Añadido al contexto
+    }
+
+    # Manejo de formularios para añadir y editar productos
+    if request.method == 'POST':
+        if 'add_producto' in request.POST:  # Si se pulsa el botón de Añadir Producto
+            producto_form = ProductoForm(request.POST)
+            if producto_form.is_valid():
+                producto_form.save()
+                return redirect('productos')  # Redirige a la misma página
+        elif 'edit_producto' in request.POST:  # Si se pulsa el botón de Editar Producto
+            # Obtener el id del producto desde el formulario POST
+            producto_id = request.POST.get('producto_id')  # El ID viene con el formulario
+            producto = get_object_or_404(Producto, ID_producto=producto_id)
+            producto_form = ProductoForm(request.POST, instance=producto)
+            if producto_form.is_valid():
+                producto_form.save()
+                return redirect('productos')  # Redirige a la misma página
+    else:
+        producto_form = ProductoForm()
+
+    # Si estamos editando un producto, obtenemos ese producto
+    producto_id = request.GET.get('edit', None)
+    if producto_id:
+        producto = get_object_or_404(Producto, ID_producto=producto_id)
+        producto_form = ProductoForm(instance=producto)
+
+    context['producto_form'] = producto_form
+
+    html_template = loader.get_template('home/productos.html')
+    return HttpResponse(html_template.render(context, request))
+
+#eliminar productos
+@login_required(login_url="/login/")
+def eliminar_producto(request, producto_id):
+    # Asegurarse de que la solicitud sea POST
+    if request.method == 'POST':
+        producto = get_object_or_404(Producto, ID_producto=producto_id)  # Buscar el producto por su ID
+        producto.delete()  # Elimina el producto de la base de datos
+
+    return redirect('productos')  # Redirige a la vista de productos
+
+
+#otros
+
 @login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
@@ -175,3 +240,4 @@ def pages(request):
     
     
 
+#crear una vista que sea una clase con sus funciones
