@@ -18,7 +18,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
 
-
+# Empleado
 from .forms import EmpleadoForm
 from .models import Empleado
 
@@ -182,35 +182,42 @@ def pages(request):
     
 
 
-
-def registrar_empleado(request,action,empleado_id=None):
-    if action == 'listar':
-        empleados = Empleado.objects.all()
-        return render(request,'empleados/empleados.html',{'action':'listar','empleados':empleados})
-    elif action == 'registrar':
-        if request.method == 'POST':
+def empleados_view(request, accion, pk=None):
+    contexto = {}
+    if accion == "registrar":
+        if request.method == "POST":
             form = EmpleadoForm(request.POST)
             if form.is_valid():
                 form.save()
-                return redirect('empleado',action='listar')
+                return redirect('listar_empleados')
         else:
             form = EmpleadoForm()
-        return render(request,'empleados/empleados.html',{'action': 'registrar', 'form': form})
-    
-    elif action == 'modificar':
-        empleado = get_object_or_404(Empleado,id=empleado_id)
-        if request.method == 'POST':
-            form=EmpleadoForm(request.POST, instance=empleado)
+        contexto = {'accion': 'registrar', 'form': form}
+
+    elif accion == "listar":
+        empleados = Empleado.objects.all()
+        contexto = {'accion': 'listar', 'empleados': empleados}
+
+    elif accion == "modificar":
+        empleado = get_object_or_404(Empleado, pk=pk)
+        if request.method == "POST":
+            form = EmpleadoForm(request.POST, instance=empleado)
             if form.is_valid():
                 form.save()
-                return redirect('empleado', action='listar')
+                return redirect('listar_empleados')
         else:
             form = EmpleadoForm(instance=empleado)
-        return render(request,'empleados/empleados.html',{'action': 'modificar', 'form': form,'empleado': empleado})
-    elif action == 'consultar':
-        empleado = get_object_or_404(Empleado,id=empleado_id)
-        return render(request,'empleados/empleados.html',{'action':'consultar', 'empleado':empleado})
-    elif action == 'eliminar':
-        empleado = get_object_or_404(Empleado,id=empleado_id)
-        empleado.delete()
-        return redirect('empleado',action='listar')
+        contexto = {'accion': 'modificar', 'form': form}
+
+    elif accion == "consultar":
+        empleado = get_object_or_404(Empleado, pk=pk)
+        contexto = {'accion': 'consultar', 'empleado': empleado}
+
+    elif accion == "eliminar":
+        empleado = get_object_or_404(Empleado, pk=pk)
+        if request.method == "POST":
+            empleado.delete()
+            return redirect('listar_empleados')
+        contexto = {'accion': 'eliminar', 'empleado': empleado}
+
+    return render(request, 'empleados/empleados.html', contexto)

@@ -20,10 +20,8 @@ urlpatterns = [
  
     
     #Ruta para empleados
+    path('empleados/', views.empleados_view, name='empleados'),
 
-    path('empleados/<str:action>/',views.registrar_empleado, name='empleado'),
-    path('empleados/<str:action>/<int:empleado_id>/',views.registrar_empleado, name='empleado'),
-    
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
     
