@@ -180,44 +180,43 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
     
     
+# Listar empleados
+def listar_empleados(request):
+    empleados = Empleado.objects.all()
+    return render(request, 'empleados/listar.html', {'empleados': empleados})
 
-
-def empleados_view(request, accion, pk=None):
-    contexto = {}
-    if accion == "registrar":
-        if request.method == "POST":
-            form = EmpleadoForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('listar_empleados')
-        else:
-            form = EmpleadoForm()
-        contexto = {'accion': 'registrar', 'form': form}
-
-    elif accion == "listar":
-        empleados = Empleado.objects.all()
-        contexto = {'accion': 'listar', 'empleados': empleados}
-
-    elif accion == "modificar":
-        empleado = get_object_or_404(Empleado, pk=pk)
-        if request.method == "POST":
-            form = EmpleadoForm(request.POST, instance=empleado)
-            if form.is_valid():
-                form.save()
-                return redirect('listar_empleados')
-        else:
-            form = EmpleadoForm(instance=empleado)
-        contexto = {'accion': 'modificar', 'form': form}
-
-    elif accion == "consultar":
-        empleado = get_object_or_404(Empleado, pk=pk)
-        contexto = {'accion': 'consultar', 'empleado': empleado}
-
-    elif accion == "eliminar":
-        empleado = get_object_or_404(Empleado, pk=pk)
-        if request.method == "POST":
-            empleado.delete()
+# Registrar empleado
+def registrar_empleado(request):
+    if request.method == 'POST':
+        form = EmpleadoForm(request.POST)
+        if form.is_valid():
+            form.save()
             return redirect('listar_empleados')
-        contexto = {'accion': 'eliminar', 'empleado': empleado}
+    else:
+        form = EmpleadoForm()
+    return render(request, 'empleados/registrar.html', {'form': form})
 
-    return render(request, 'empleados/empleados.html', contexto)
+# Modificar empleado
+def modificar_empleado(request, empleado_id):
+    empleado = get_object_or_404(Empleado, id=empleado_id)
+    if request.method == 'POST':
+        form = EmpleadoForm(request.POST, instance=empleado)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_empleados')
+    else:
+        form = EmpleadoForm(instance=empleado)
+    return render(request, 'empleados/modificar.html', {'form': form, 'empleado': empleado})
+
+# Consultar empleado
+def consultar_empleado(request, empleado_id):
+    empleado = get_object_or_404(Empleado, id=empleado_id)
+    return render(request, 'empleados/consultar.html', {'empleado': empleado})
+
+# Dar de baja empleado
+def eliminar_empleado(request, empleado_id):
+    empleado = get_object_or_404(Empleado, id=empleado_id)
+    if request.method == 'POST':
+        empleado.delete()
+        return redirect('listar_empleados')
+    return render(request, 'empleados/eliminar.html', {'empleado': empleado})

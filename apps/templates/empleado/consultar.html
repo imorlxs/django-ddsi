@@ -1,0 +1,10 @@
+<h1>Consultar Empleado</h1>
+<p>Nombre: {{ empleado.nombre }}</p>
+<p>Apellido: {{ empleado.apellido }}</p>
+<p>DNI: {{ empleado.dni }}</p>
+<p>Teléfono: {{ empleado.telefono }}</p>
+<p>Email: {{ empleado.email }}</p>
+<p>Fecha de Contratación: {{ empleado.fecha_contratacion }}</p>
+<p>Fecha de Nacimiento: {{ empleado.fecha_nacimiento }}</p>
+<p>Puesto: {{ empleado.puesto }}</p>
+<a href="{% url 'listar_empleados' %}">Volver a la lista</a>
