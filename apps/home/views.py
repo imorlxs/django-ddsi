@@ -14,6 +14,8 @@ from django.db.models import Sum
 from .models import Ingreso  
 from .models import Gasto 
 from .forms import IngresoForm, GastoForm
+from .models import Socio
+from .forms import SocioForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
@@ -173,5 +175,56 @@ def pages(request):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
     
-    
+# Acciones del Socio
 
+
+@login_required(login_url="/login/")
+def listar_socios(request):
+    search_query = request.GET.get('search', '')
+    socios = Socio.objects.filter(nombreSocio__icontains=search_query) if search_query else Socio.objects.all()
+    return render(request, 'socios/listar_socios.html', {'socios': socios})
+
+
+@login_required(login_url="/login/")
+def alta_socio(request):
+    if request.method == 'POST':
+        form = SocioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Socio añadido con éxito.')
+            return redirect('listar_socios')
+    else:
+        form = SocioForm()
+    return render(request, 'socios/alta_socio.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+def modificar_socio(request, DNISocio):
+    socio = get_object_or_404(Socio, DNISocio=DNISocio)
+    if request.method == 'POST':
+        form = SocioForm(request.POST, instance=socio)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Información del socio actualizada.')
+            return redirect('listar_socios')
+    else:
+        form = SocioForm(instance=socio)
+    return render(request, 'socios/modificar_socio.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+def baja_socio(request, DNISocio):
+    socio = get_object_or_404(Socio, DNISocio=DNISocio)
+    if request.method == 'POST':
+        socio.fecha_bajaSocio = request.POST.get('fecha_baja')
+        socio.motivo_bajaSocio = request.POST.get('motivo_baja')
+        socio.save()
+        messages.success(request, 'Socio dado de baja.')
+        return redirect('listar_socios')
+    return render(request, 'socios/baja_socio.html', {'socio': socio})
+
+
+@login_required(login_url="/login/")
+def detalle_socio(request, DNISocio):
+    socio = get_object_or_404(Socio, DNISocio=DNISocio)
+    return render(request, 'socios/detalle_socio.html', {'socio': socio})
