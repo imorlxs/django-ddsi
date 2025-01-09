@@ -1,0 +1,148 @@
+{% extends "layouts/base.html" %}
+{% block title %} Gestión de Socios {% endblock %}
+
+<!-- Specific Page CSS goes HERE vamos a dejar el global predefinido por el proyecto -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+  <!-- Barra de búsqueda -->
+  <div class="col-md-12">
+    <form method="get" action="{% url 'socios' %}" class="form-inline mb-3">
+      <input type="text" class="form-control" name="search" placeholder="Buscar socio..." value="{{ request.GET.search }}">
+      <button type="submit" class="btn btn-primary ml-2">Buscar</button>
+    </form>
+  </div>
+
+  <!-- Tabla de socios -->
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Gestión de Socios</h4>
+        <p class="card-category">Listado de socios registrados</p>
+        <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#addSocioModal">
+          Añadir Socio
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <th>DNI</th>
+              <th>Nombre</th>
+              <th>Apellidos</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Acciones</th>
+            </thead>
+            <tbody>
+              {% for socio in socios %}
+              <tr>
+                <td>{{ socio.DNISocio }}</td>
+                <td>{{ socio.nombreSocio }}</td>
+                <td>{{ socio.apellidosSocio }}</td>
+                <td>{{ socio.emailSocio }}</td>
+                <td>{{ socio.telefonoSocio }}</td>
+                <td class="td-actions">
+                  <button type="button" class="btn btn-success btn-round" data-toggle="modal" data-target="#editSocioModal" 
+                          data-dni="{{ socio.DNISocio }}" 
+                          data-nombre="{{ socio.nombreSocio }}" 
+                          data-apellidos="{{ socio.apellidosSocio }}" 
+                          data-email="{{ socio.emailSocio }}" 
+                          data-telefono="{{ socio.telefonoSocio }}"
+                          data-direccion="{{ socio.direccionSocio }}"
+                          data-fecha-nac="{{ socio.fecha_nacSocio }}">
+                    <i class="material-icons">edit</i>
+                  </button>
+                  <form action="{% url 'eliminar_socio' socio.DNISocio %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-round">
+                      <i class="material-icons">close</i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar socio -->
+<div class="modal" id="addSocioModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Añadir Socio</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ socio_form }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" name="add_socio">Guardar Socio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar socio -->
+<div class="modal" id="editSocioModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Socio</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ socio_form }}
+          <input type="hidden" id="edit_DNISocio" name="DNISocio" value="">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" name="edit_socio">Confirmar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE solamente ponemos uno -->
+{% block javascripts %}
+<script>
+  $('#editSocioModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var dni = button.data('dni');
+    var nombre = button.data('nombre');
+    var apellidos = button.data('apellidos');
+    var email = button.data('email');
+    var telefono = button.data('telefono');
+    var direccion = button.data('direccion');
+    var fecha_nac = button.data('fecha-nac');
+
+    var modal = $(this);
+    modal.find('#edit_DNISocio').val(dni);
+    modal.find('#id_nombreSocio').val(nombre);
+    modal.find('#id_apellidosSocio').val(apellidos);
+    modal.find('#id_emailSocio').val(email);
+    modal.find('#id_telefonoSocio').val(telefono);
+    modal.find('#id_direccionSocio').val(direccion);
+    modal.find('#id_fecha_nacSocio').val(fecha_nac);
+  });
+</script>
+{% endblock javascripts %}
