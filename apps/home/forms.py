@@ -1,5 +1,5 @@
 from django import forms
-from .models import Ingreso, Gasto, Socio # Importa los modelos
+from .models import Ingreso, Gasto, Socio, Campana  # Importa los modelos
 
 class IngresoForm(forms.ModelForm):
     class Meta:
@@ -41,4 +41,16 @@ class SocioForm(forms.ModelForm):
             'fecha_nacSocio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'motivo_bajaSocio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'fecha_bajaSocio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+
+class CampanaForm(forms.ModelForm):
+    class Meta:
+        model = Campana
+        fields = ['id_campana', 'nombre_campana', 'tipo', 'estado', 'precio']
+        widgets = {
+            'id_campana': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombre_campana': forms.TextInput(attrs={'class': 'form-control'}),
+            'tipo': forms.TextInput(attrs={'class': 'form-control'}),
+            'estado': forms.Select(attrs={'class': 'form-control'}),
+            'precio': forms.NumberInput(attrs={'class': 'form-control'}),
         }
