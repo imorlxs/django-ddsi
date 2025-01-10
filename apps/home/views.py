@@ -131,7 +131,7 @@ def eliminar_ingreso(request, ingreso_id):
         ingreso = get_object_or_404(Ingreso, id_ingreso=ingreso_id)
         ingreso.delete()  # Elimina el ingreso de la base de datos
 
-    return redirect('contabilidad')  # Redirige a la vista de contabilidad
+    return redirect('ingresos')  
 
 @login_required(login_url="/login/")
 def eliminar_gasto(request, gasto_id):
@@ -140,7 +140,7 @@ def eliminar_gasto(request, gasto_id):
         gasto = get_object_or_404(Gasto, id_gasto=gasto_id)
         gasto.delete()  # Elimina el ingreso de la base de datos
 
-    return redirect('contabilidad')  # Redirige a la vista de contabilidad
+    return redirect('gastos')  
 
 @login_required(login_url="/login/")
 def index(request):

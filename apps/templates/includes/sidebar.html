@@ -9,12 +9,6 @@
         <ul class="nav">
         {% if request.user.is_authenticated %}
 
-          <li class="nav-item {% if 'ordenas' in segment %} active {% endif %}">
-            <a class="nav-link" href="{% url 'ordenas' %}">
-              <i class="material-icons">dashboard</i>
-              <p>Hacer un pedido</p>
-            </a>
-          </li>
           <li class="nav-item {% if 'socios' in segment %} active {% endif %}">
             <a class="nav-link" href="{% url 'socios' %}">
               <i class="material-icons">person</i>
@@ -47,9 +41,16 @@
             </a>
           </li>
 
+          <li class="nav-item {% if 'ordenas' in segment %} active {% endif %}">
+            <a class="nav-link" href="{% url 'ordenas' %}">
+              <i class="material-icons">local_shipping</i>
+              <p>Realizar pedido</p>
+            </a>
+          </li>
+          
           <li class="nav-item {% if 'compras' in segment %} active {% endif %}">
             <a class="nav-link" href="{% url 'compras' %}">
-              <i class="material-icons">ads_click</i>
+              <i class="material-icons">shopping_cart</i>
               <p>Realizar una venta</p>
             </a>
           </li>

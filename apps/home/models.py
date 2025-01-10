@@ -84,6 +84,11 @@ class Campana(models.Model):
 
     def _str_(self):  
         return f'Campana {self.id_campana}'
+    
+    def delete(self, *args, **kwargs):
+        for genera in Genera.objects.filter(id_campana=self):
+            genera.id_gasto.delete()
+        super().delete(*args, **kwargs)
 
 # Genera
 class Genera(models.Model):
