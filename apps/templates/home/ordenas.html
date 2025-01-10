@@ -1,0 +1,135 @@
+{% extends "layouts/base.html" %}
+{% block title %} UI Tables {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+
+<div class="row">
+<!-- Barra de búsqueda -->
+
+
+<!--Ordenas-->
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h4 class="card-title">Ordenas</h4>
+      <p class="card-category">Listado de todos los ordenas</p>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+          <form method="get" action="{% url 'ordenas' %}" class="form-inline">
+            <input type="text" class="form-control" name="search" placeholder="Buscar Ordena..." value="{{ request.GET.search }}">
+            <button type="submit" class="btn btn-primary ml-2">Buscar</button>
+          </form>
+        </div>
+              <div class="d-flex">
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addOrdenaModal">
+            Añadir Ordena
+          </button>
+        </div>      
+      </div>
+      
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead class="text-primary">
+            <th class="text-center">ID</th>
+            <th>Monto Ordena</th>
+            <th class="text-right">Acciones</th>
+          </thead>
+          <tbody>
+            {% for ordena in ordenas %}
+            <tr>
+              <td class="text-center">{{ ordena.id_ordena }}</td>
+              <td>&euro; {{ ordena.monto_ordena }}</td>
+              <td class="td-actions text-right">
+                <button type="button" class="btn btn-success btn-round" data-toggle="modal" data-target="#editOrdenaModal" id="editButton" data-id="{{ ordena.id_ordena }}">
+                    <i class="material-icons">edit</i>
+                  </button>
+                <form action="{% url 'eliminar_ordena' ordena.id_ordena %}" method="post" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-round">
+                    <i class="material-icons">close</i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar Ordena -->
+<div class="modal" id="addOrdenaModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Añadir Ordena</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ ordena_form }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" name="add_ordena">Guardar Ordena</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar Ordena -->
+<div class="modal" id="editOrdenaModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Ordena</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {{ ordena_form }}
+            <input type="hidden" id="ordena_id" name="ordena_id" value="">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" name="edit_ordena">Confirmar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+    $('#editButton').on('click', function () {
+    // Obtener el ID del ordena desde el atributo data-id del botón
+    var idOrdena = $(this).data('id');
+    
+    // Asignar el valor al campo oculto del formulario
+    $('#ordena_id').val(idOrdena);
+    
+    // Opcional: Si quieres llenar otros campos del formulario, también puedes hacerlo
+    // $('#montoOrdena').val(someValue);
+});
+
+</script>
+
+{% endblock javascripts %}

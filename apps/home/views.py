@@ -430,20 +430,44 @@ def eliminar_socio(request, DNISocio):
 
 @login_required(login_url="/login/")
 def ordenar_view(request):
-    if request.method == 'POST':
-        form = OrdenaForm(request.POST)
-        if form.is_valid():
-            cleaned_data = form.cleaned_data
-            producto_id = cleaned_data.get('producto_id')
-            cantidad = cleaned_data.get('cantidad')
-            try:
-                producto = Producto.objects.get(ID_producto=producto_id)
-                gasto = Gasto.objects.create(monto_gasto=producto.precio * cantidad)
-                Ordena.objects.create(id_producto=producto, id_gasto=gasto, cantidad=cantidad)
-                messages.success(request, "Orden creada exitosamente.")
-            except Producto.DoesNotExist:
-                messages.error(request, "Producto no encontrado.")
-            return redirect('ordenar')
+    # BUSCAR ORDENAS
+    search_query = request.GET.get('search', '')
+    if search_query:
+        ordenas = Ordena.objects.filter(id_ordena__icontains=search_query)
     else:
-        form = OrdenaForm()
-    return render(request, 'home/ordenar.html', {'form': form})
+        ordenas = Ordena.objects.all()
+    context = {
+        'ordenas': ordenas,
+    }
+    # Manejo de formularios para añadir y editar ordenas
+    if request.method == 'POST':
+        if 'add_ordena' in request.POST:  # Si se pulsa el botón de Añadir Ordena
+            ordena_form = OrdenaForm(request.POST)
+            if ordena_form.is_valid():
+                ordena_form.save()
+                return redirect('ordenas')  # Redirige a la misma página
+        elif 'edit_ordena' in request.POST:  # Si se pulsa el botón de Editar Ordena
+            # Obtener el id de la ordena desde el formulario POST
+            ordena_id = request.POST.get('ordena_id')  # El ID viene con el formulario
+            ordena = get_object_or_404(Ordena, id_ordena=ordena_id)
+            ordena_form = OrdenaForm(request.POST, instance=ordena)
+            if ordena_form.is_valid():
+                ordena_form.save()
+                return redirect('ordenas')  # Redirige a la misma página
+    else:
+        ordena_form = OrdenaForm()
+    # Si estamos editando una ordena, obtenemos esa ordena
+    ordena_id = request.GET.get('edit', None)
+    if ordena_id:
+        ordena = get_object_or_404(Ordena, id_ordena=ordena_id)
+        ordena_form = OrdenaForm(instance=ordena)
+    context['ordena_form'] = ordena_form
+    html_template = loader.get_template('home/ordenas.html')
+    return HttpResponse(html_template.render(context, request))
+@login_required(login_url="/login/")
+def eliminar_ordena(request, ordena_id):
+    # Asegurarse de que la solicitud sea POST
+    if request.method == 'POST':
+        ordena = get_object_or_404(Ordena, id_ordena=ordena_id)
+        ordena.delete()  # Elimina la ordena de la base de datos
+    return redirect('ordenas')  # Redirige a la vista de ordenas

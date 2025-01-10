@@ -1,5 +1,6 @@
 from django import forms
 from .models import Ingreso, Gasto, Campana, Empleado, Producto, Socio, Ordena, Compra, Genera  # Importa los modelos
+from django.utils import timezone
 
 class IngresoForm(forms.ModelForm):
     class Meta:
@@ -82,20 +83,27 @@ class SocioForm(forms.ModelForm):
             'fecha_nacSocio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
         
-class OrdenaForm(forms.Form):
-    producto_id = forms.CharField(max_length=13, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    cantidad = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
-
-    def clean(self):
-        cleaned_data = super().clean()
-        producto_id = cleaned_data.get("producto_id")
-        cantidad = cleaned_data.get("cantidad")
-
-        if producto_id and cantidad:
-            try:
-                producto = Producto.objects.get(ID_producto=producto_id)
-            except Producto.DoesNotExist:
-                raise forms.ValidationError("Producto no encontrado")
-
-            gasto = Gasto.objects.create(monto_gasto=producto.precio * cantidad)
-            Ordena.objects.create(id_gasto=gasto)
+class OrdenaForm(forms.ModelForm):
+    class Meta:
+        model = Ordena
+        fields = ['id_producto', 'cantidad']
+        widgets = {
+            'id_producto': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        producto = instance.id_producto
+        cantidad = instance.cantidad
+        monto_gasto = producto.precio * cantidad
+    
+        gasto = Gasto.objects.create(monto_gasto=monto_gasto)
+        instance.id_gasto = gasto
+        instance.fecha_gasto = timezone.now().date()
+        instance.hora_gasto = timezone.now()
+    
+        if commit:
+            instance.save()
+        return instance
+    

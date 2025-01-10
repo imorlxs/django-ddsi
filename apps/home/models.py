@@ -98,6 +98,7 @@ class Genera(models.Model):
 class Ordena(models.Model):
     id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     id_gasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
     fecha_gasto = models.DateField()
     hora_gasto = models.DateTimeField()
 

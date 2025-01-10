@@ -31,6 +31,9 @@ urlpatterns = [
     
     path('socios', views.socios_view, name='socios'),  # Vista principal de socios
     path('eliminar_socio/<str:DNISocio>/', views.eliminar_socio, name='eliminar_socio'),  # Eliminar socio
+
+    path('ordenas', views.ordenar_view, name='ordenas'),
+    path('eliminar_ordena/<int:ordena_id>/', views.eliminar_ordena, name='eliminar_ordena'),
     
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
