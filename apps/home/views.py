@@ -12,8 +12,8 @@ from django.db.models import Sum
 from django.db.models import Q
 
 # Modelos DDSI
-from .models import Ingreso, Gasto, Campana, Empleado, Producto, Socio, Ordena
-from .forms import IngresoForm, GastoForm, CampanaForm, EmpleadoForm, ProductoForm, SocioForm, OrdenaForm
+from .models import Ingreso, Gasto, Campana, Empleado, Producto, Socio, Ordena, Compra
+from .forms import IngresoForm, GastoForm, CampanaForm, EmpleadoForm, ProductoForm, SocioForm, OrdenaForm, CompraForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
@@ -46,6 +46,7 @@ def ingresos_view(request):
 
     context = {
         'ingresos': ingresos,
+        'segment': 'ingresos',
     }
 
     # Manejo de formularios para anadir ingresos y gastos
@@ -89,6 +90,7 @@ def gastos_view(request):
 
     context = {
         'gastos': gastos,
+        'segment': 'gastos',
     }
 
     # Manejo de formularios para anadir gastos y gastos
@@ -186,6 +188,7 @@ def campanas_view(request):
 
     context = {
         'campanas': campanas,
+        'segment': 'campanas',
     }
 
     # Modules Management
@@ -251,6 +254,7 @@ def empleados_view(request):
     
         context = {
             'empleados': empleados,
+            'segment': 'empleados',
         }
     
         # Employee form management
@@ -321,6 +325,7 @@ def productos_view(request):
     context = {
         'productos': productos,
         'productos_sin_stock': productos_sin_stock,  # Añadido al contexto
+        'segment': 'productos',
     }
 
     # Manejo de formularios para añadir y editar productos
@@ -373,6 +378,7 @@ def socios_view(request):
     
         context = {
             'socios': socios,
+            'segment': 'socios',
         }
     
         # Employee form management
@@ -438,6 +444,7 @@ def ordenar_view(request):
         ordenas = Ordena.objects.all()
     context = {
         'ordenas': ordenas,
+        'segment': 'ordenas',
     }
     # Manejo de formularios para añadir y editar ordenas
     if request.method == 'POST':
@@ -446,28 +453,55 @@ def ordenar_view(request):
             if ordena_form.is_valid():
                 ordena_form.save()
                 return redirect('ordenas')  # Redirige a la misma página
-        elif 'edit_ordena' in request.POST:  # Si se pulsa el botón de Editar Ordena
-            # Obtener el id de la ordena desde el formulario POST
-            ordena_id = request.POST.get('ordena_id')  # El ID viene con el formulario
-            ordena = get_object_or_404(Ordena, id_ordena=ordena_id)
-            ordena_form = OrdenaForm(request.POST, instance=ordena)
-            if ordena_form.is_valid():
-                ordena_form.save()
-                return redirect('ordenas')  # Redirige a la misma página
+
     else:
         ordena_form = OrdenaForm()
     # Si estamos editando una ordena, obtenemos esa ordena
-    ordena_id = request.GET.get('edit', None)
-    if ordena_id:
-        ordena = get_object_or_404(Ordena, id_ordena=ordena_id)
-        ordena_form = OrdenaForm(instance=ordena)
     context['ordena_form'] = ordena_form
     html_template = loader.get_template('home/ordenas.html')
     return HttpResponse(html_template.render(context, request))
 @login_required(login_url="/login/")
-def eliminar_ordena(request, ordena_id):
+
+def eliminar_ordena(request, id_gasto):
     # Asegurarse de que la solicitud sea POST
     if request.method == 'POST':
-        ordena = get_object_or_404(Ordena, id_ordena=ordena_id)
+        ordena = get_object_or_404(Ordena, id_gasto=id_gasto)
         ordena.delete()  # Elimina la ordena de la base de datos
     return redirect('ordenas')  # Redirige a la vista de ordenas
+
+
+
+@login_required(login_url="/login/")
+def compras_view(request):
+    # BUSCAR COMPRAS
+    search_query = request.GET.get('search', '')
+    if search_query:
+        compras = Compra.objects.filter(id_compra__icontains=search_query)
+    else:
+        compras = Compra.objects.all()
+    context = {
+        'compras': compras,
+        'segment': 'compras',
+    }
+    # Manejo de formularios para añadir y editar compras
+    if request.method == 'POST':
+        if 'add_compra' in request.POST:  # Si se pulsa el botón de Añadir Compra
+            compra_form = CompraForm(request.POST)
+            if compra_form.is_valid():
+                compra_form.save()
+                return redirect('compras')  # Redirige a la misma página
+    else:
+        compra_form = CompraForm()
+    # Si estamos editando una compra, obtenemos esa compra
+    context['compra_form'] = compra_form
+    html_template = loader.get_template('home/compras.html')
+    return HttpResponse(html_template.render(context, request))
+
+
+@login_required(login_url="/login/")
+def eliminar_compra(request, id_compra):
+    # Asegurarse de que la solicitud sea POST
+    if request.method == 'POST':
+        compra = get_object_or_404(Compra, id_compra=id_compra)
+        compra.delete()  # Elimina la compra de la base de datos
+    return redirect('compras')  # Redirige a la vista de compras

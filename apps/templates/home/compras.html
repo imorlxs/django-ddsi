@@ -9,22 +9,22 @@
 <!-- Barra de búsqueda -->
 
 
-<!--Ordenas-->
+<!--Compras-->
 <div class="col-md-12">
   <div class="card">
     <div class="card-header card-header-primary">
-      <h4 class="card-title">Ordenas</h4>
-      <p class="card-category">Listado de todos los ordenas</p>
+      <h4 class="card-title">Compras</h4>
+      <p class="card-category">Listado de todos los compras</p>
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex">
-          <form method="get" action="{% url 'ordenas' %}" class="form-inline">
-            <input type="text" class="form-control" name="search" placeholder="Buscar Ordena..." value="{{ request.GET.search }}">
+          <form method="get" action="{% url 'compras' %}" class="form-inline">
+            <input type="text" class="form-control" name="search" placeholder="Buscar Compra..." value="{{ request.GET.search }}">
             <button type="submit" class="btn btn-primary ml-2">Buscar</button>
           </form>
         </div>
               <div class="d-flex">
-          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addOrdenaModal">
-            Añadir Ordena
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addCompraModal">
+            Añadir Compra
           </button>
         </div>      
       </div>
@@ -41,14 +41,14 @@
             <th class="text-right">Acciones</th>
           </thead>
           <tbody>
-            {% for ordena in ordenas %}
+            {% for compra in compras %}
             <tr>
-              <td class="text-center">{{ ordena.id_producto.ID_producto }}</td>
-              <td class="text-center">{{ ordena.id_gasto.id_gasto }}</td>
-              <td>{{ ordena.cantidad }}</td>
-              <td>{{ ordena.hora_gasto }}</td>
+              <td class="text-center">{{ compra.id_producto.ID_producto }}</td>
+              <td class="text-center">{{ compra.id_gasto.id_gasto }}</td>
+              <td>{{ compra.cantidad }}</td>
+              <td>{{ compra.hora_gasto }}</td>
               <td class="td-actions text-right">
-                <form action="{% url 'eliminar_ordena' ordena.id_gasto.id_gasto %}" method="post" style="display:inline;">
+                <form action="{% url 'eliminar_compra' compra.id_gasto.id_gasto %}" method="post" style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-danger btn-round">
                     <i class="material-icons">close</i>
@@ -65,24 +65,24 @@
 </div>
 
 
-<!-- Modal para agregar Ordena -->
-<div class="modal" id="addOrdenaModal" tabindex="-1" role="dialog">
+<!-- Modal para agregar Compra -->
+<div class="modal" id="addCompraModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form method="post">
         {% csrf_token %}
         <div class="modal-header">
-          <h5 class="modal-title">Añadir Ordena</h5>
+          <h5 class="modal-title">Añadir Compra</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          {{ ordena_form }}
+          {{ compra_form }}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary" name="add_ordena">Guardar Ordena</button>
+          <button type="submit" class="btn btn-primary" name="add_compra">Guardar Compra</button>
         </div>
       </form>
     </div>

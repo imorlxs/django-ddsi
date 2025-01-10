@@ -104,13 +104,24 @@ class Ordena(models.Model):
 
     class Meta:
         unique_together = ('id_producto', 'id_gasto')
+        
+    def delete(self, *args, **kwargs):
+        producto = self.id_producto
+        producto.cantidad -= self.cantidad
+        producto.save()
+        self.id_gasto.delete()
+        super().delete(*args, **kwargs)
 
 
 # Compra
 class Compra(models.Model):
     id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    id_ingreso = models.ForeignKey(Ingreso, on_delete=models.CASCADE)
     dnisocio = models.ForeignKey(Socio, on_delete=models.CASCADE)
     fecha_compra = models.DateField()
+    cantidad = models.IntegerField()
+
+    
 
     class Meta:
         unique_together = ('id_producto', 'dnisocio')

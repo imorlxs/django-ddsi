@@ -30,6 +30,18 @@ class CampanaForm(forms.ModelForm):
             'precio': forms.NumberInput(attrs={'class': 'form-control'}),
         }
         
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        gasto = Gasto.objects.create(monto_gasto=instance.precio)
+       
+        
+        if commit:
+            instance.save()
+            Genera.objects.create(id_campana=instance, id_gasto=gasto)
+            
+        return instance
+        
 
 class EmpleadoForm(forms.ModelForm):
     class Meta:
@@ -100,10 +112,33 @@ class OrdenaForm(forms.ModelForm):
     
         gasto = Gasto.objects.create(monto_gasto=monto_gasto)
         instance.id_gasto = gasto
+      
         instance.fecha_gasto = timezone.now().date()
         instance.hora_gasto = timezone.now()
     
         if commit:
             instance.save()
+            producto.cantidad += cantidad
+            producto.save()
         return instance
-    
+
+class CompraForm(forms.ModelForm):
+    class Meta:
+        model = Compra
+        fields = ['id_producto', 'dnisocio', 'cantidad']
+        widgets = {
+            'id_producto': forms.Select(attrs={'class': 'form-control'}),
+            'dnisocio': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+        
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.fecha_compra = timezone.now().date()
+        ingreso = Ingreso.objects.create(monto_ingreso=instance.id_producto.precio * instance.cantidad)
+        if commit:
+            instance.save()
+            producto = instance.id_producto
+            producto.cantidad -= instance.cantidad
+            producto.save()
+        return instance
