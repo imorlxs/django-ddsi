@@ -51,9 +51,15 @@
               <td>{{ producto.tallas }}</td>
               <td>{{ producto.proveedor }}</td>
               <td class="td-actions text-right">
-                <button type="button" class="btn btn-success btn-round" data-toggle="modal" data-target="#editProductoModal" id="editButton" data-id="{{ producto.ID_producto }}">
-                    <i class="material-icons">edit</i>
-                  </button>
+                <button type="button" class="btn btn-success btn-round" data-toggle="modal" data-target="#editProductoModal" 
+                  data-id="{{ producto.ID_producto }}" 
+                  data-nombre="{{ producto.nombre_producto }}" 
+                  data-cantidad="{{ producto.cantidad }}" 
+                  data-precio="{{ producto.precio }}" 
+                  data-tallas="{{ producto.tallas }}" 
+                  data-proveedor="{{ producto.proveedor }}">
+                  <i class="material-icons">edit</i>
+                </button>
                 <form action="{% url 'eliminar_producto' producto.ID_producto %}" method="post" style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-danger btn-round">
@@ -121,34 +127,6 @@
 
 </div>
 
-<!--Modala para el restock -- !>
-<div class="row">
-  <! -- Aviso de restock -->
-  {% if productos_sin_stock %}
-  <div class="col-md-12">
-    <div class="alert alert-warning">
-      <h4 class="alert-heading">Aviso de Restock</h4>
-      <p>Los siguientes productos necesitan restock:</p>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID Producto</th>
-            <th>Nombre Producto</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for producto in productos_sin_stock %}
-          <tr>
-            <td>{{ producto.ID_producto }}</td>
-            <td>{{ producto.nombre_producto }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  {% endif %}
-</div>
 
 
 {% endblock content %}
@@ -156,18 +134,23 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-    $('#editButton').on('click', function () {
-    // Obtener el ID del producto desde el atributo data-id del botón
-    var idProducto = $(this).data('id');
+$('#editProductoModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget);
+  var id = button.data('id');
+  var nombre = button.data('nombre');
+  var cantidad = button.data('cantidad');
+  var precio = button.data('precio');
+  var tallas = button.data('tallas');
+  var proveedor = button.data('proveedor');
 
-    // Asignar el valor al campo oculto del formulario
-    $('#producto_id').val(idProducto);
-
-    // Opcional: Si quieres llenar otros campos del formulario, también puedes hacerlo
-    // $('#nombreProducto').val(someValue);
+  var modal = $(this);
+  modal.find('#id_ID_producto').val(id);
+  modal.find('#id_nombre_producto').val(nombre);
+  modal.find('#id_cantidad').val(cantidad);
+  modal.find('#id_precio').val(precio);
+  modal.find('#id_tallas').val(tallas);
+  modal.find('#id_proveedor').val(proveedor);
 });
-
-
 
 </script>
 

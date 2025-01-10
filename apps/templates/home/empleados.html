@@ -1,81 +1,84 @@
 {% extends "layouts/base.html" %}
-{% block title %} Empleados {% endblock %}
+{% block title %} Gestión de Empleados {% endblock %}
 
-<!-- Specific Page CSS goes HERE  -->
+<!-- Specific Page CSS goes HERE vamos a dejar el global predefinido por el proyecto -->
 {% block stylesheets %}{% endblock stylesheets %}
+
 {% block content %}
-
 <div class="row">
-<!-- Barra de búsqueda -->
+  <!-- Barra de búsqueda -->
+  <div class="col-md-12">
+    <form method="get" action="{% url 'empleados' %}" class="form-inline mb-3">
+      <input type="text" class="form-control" name="search" placeholder="Buscar empleado..." value="{{ request.GET.search }}">
+      <button type="submit" class="btn btn-primary ml-2">Buscar</button>
+    </form>
+  </div>
 
-
-<!--Empleados-->
-<div class="col-md-12">
-  <div class="card">
-    <div class="card-header card-header-primary">
-      <h4 class="card-title">Empleados</h4>
-      <p class="card-category">Listado de todos los empleados</p>
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex">
-          <form method="get" action="{% url 'empleados' %}" class="form-inline">
-            <input type="text" class="form-control" name="search" placeholder="Buscar Empleado..." value="{{ request.GET.search }}">
-            <button type="submit" class="btn btn-primary ml-2">Buscar</button>
-          </form>
-        </div>
-        <div class="d-flex">
-          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addEmpleadoModal">
-            Añadir Empleado
-          </button>
-        </div>      
+  <!-- Tabla de empleados -->
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Gestión de Empleados</h4>
+        <p class="card-category">Listado de empleados registrados</p>
+        <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#addEmpleadoModal">
+          Añadir Empleado
+        </button>
       </div>
-      
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table">
-          <thead class="text-primary">
-            <th class="text-center">DNI</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Cargo</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>Dirección</th>
-            <th>Fecha de Nacimiento</th>
-            <th class="text-right">Acciones</th>
-          </thead>
-          <tbody>
-            {% for empleado in empleados %}
-            <tr>
-              <td class="text-center">{{ empleado.DNIEmpleado }}</td>
-              <td>{{ empleado.nombreEmpleado }}</td>
-              <td>{{ empleado.apellidosEmpleado }}</td>
-              <td>{{ empleado.cargo }}</td>
-              <td>{{ empleado.emailEmpleado }}</td>
-              <td>{{ empleado.telefonoEmpleado }}</td>
-              <td>{{ empleado.direccionEmpleado }}</td>
-              <td>{{ empleado.fecha_nacEmpleado }}</td>
-              <td class="td-actions text-right">
-                <button type="button" class="btn btn-success btn-round" data-toggle="modal" data-target="#editEmpleadoModal" id="editButton" data-id="{{ empleado.DNIEmpleado }}">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <th>DNI</th>
+              <th>Nombre</th>
+              <th>Apellidos</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Dirección</th>
+              <th>Fecha de Nacimiento</th>
+              <th>Cargo</th>
+              <th>Acciones</th>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                <tr>
+                <td>{{ empleado.DNIEmpleado }}</td>
+                <td>{{ empleado.nombreEmpleado }}</td>
+                <td>{{ empleado.apellidosEmpleado }}</td>
+                <td>{{ empleado.emailEmpleado }}</td>
+                <td>{{ empleado.telefonoEmpleado }}</td>
+                <td>{{ empleado.direccionEmpleado }}</td>
+                <td>{{ empleado.fecha_nacEmpleado }}</td>
+                <td>{{ empleado.cargo }}</td>
+                <td class="td-actions">
+                  <button type="button" class="btn btn-success btn-round" data-toggle="modal" data-target="#editEmpleadoModal" 
+                      data-dni="{{ empleado.DNIEmpleado }}" 
+                      data-nombre="{{ empleado.nombreEmpleado }}" 
+                      data-apellidos="{{ empleado.apellidosEmpleado }}" 
+                      data-email="{{ empleado.emailEmpleado }}" 
+                      data-telefono="{{ empleado.telefonoEmpleado }}"
+                      data-direccion="{{ empleado.direccionEmpleado }}"
+                      data-fecha-nac="{{ empleado.fecha_nacEmpleado }}"
+                      data-cargo="{{ empleado.cargo }}">
                   <i class="material-icons">edit</i>
-                </button>
-                <form action="{% url 'eliminar_empleado' empleado.DNIEmpleado %}" method="post" style="display:inline;">
+                  </button>
+                  <form action="{% url 'eliminar_empleado' empleado.DNIEmpleado %}" method="post" style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-danger btn-round">
                     <i class="material-icons">close</i>
                   </button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+                  </form>
+                </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal para agregar Empleado -->
+<!-- Modal para agregar empleado -->
 <div class="modal" id="addEmpleadoModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -99,49 +102,56 @@
   </div>
 </div>
 
-<!-- Modal para editar Empleado -->
+<!-- Modal para editar empleado -->
 <div class="modal" id="editEmpleadoModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <form method="post">
-          {% csrf_token %}
-          <div class="modal-header">
-            <h5 class="modal-title">Editar Empleado</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            {{ empleado_form }}
-            <input type="hidden" id="DNIEmpleado" name="DNIEmpleado" value="">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary" name="edit_empleado">Confirmar</button>
-          </div>
-        </form>
-      </div>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Empleado</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ empleado_form }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" name="edit_empleado">Confirmar</button>
+        </div>
+      </form>
     </div>
   </div>
-
 </div>
 
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE  -->
+<!-- Specific Page JS goes HERE solamente ponemos uno -->
 {% block javascripts %}
 <script>
-    $('#editButton').on('click', function () {
-    // Obtener el ID del empleado desde el atributo data-id del botón
-    var idEmpleado = $(this).data('id');
-    
-    // Asignar el valor al campo oculto del formulario
-    $('#DNIEmpleado').val(idEmpleado);
-    
-    // Opcional: Si quieres llenar otros campos del formulario, también puedes hacerlo
-    // $('#montoEmpleado').val(someValue);
-});
+  $('#editEmpleadoModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var dni = button.data('dni');
+    var nombre = button.data('nombre');
+    var apellidos = button.data('apellidos');
+    var email = button.data('email');
+    var cargo = button.data('cargo');
+    var telefono = button.data('telefono');
+    var direccion = button.data('direccion');
+    var fecha_nac = button.data('fecha-nac');
 
+    var modal = $(this);
+    modal.find('#id_DNIEmpleado').val(dni);
+    modal.find('#id_nombreEmpleado').val(nombre);
+    modal.find('#id_apellidosEmpleado').val(apellidos);
+    modal.find('#id_emailEmpleado').val(email);
+    modal.find('#id_telefonoEmpleado').val(telefono);
+    modal.find('#id_direccionEmpleado').val(direccion);
+    modal.find('#id_fecha_nacEmpleado').val(fecha_nac);
+    modal.find('#id_cargo').val(cargo);
+
+  });
 </script>
-
 {% endblock javascripts %}

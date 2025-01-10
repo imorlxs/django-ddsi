@@ -1,5 +1,5 @@
 from django import forms
-from .models import Ingreso, Gasto, Campana, Empleado, Producto  # Importa los modelos
+from .models import Ingreso, Gasto, Campana, Empleado, Producto, Socio, Ordena, Compra, Genera  # Importa los modelos
 
 class IngresoForm(forms.ModelForm):
     class Meta:
@@ -59,3 +59,43 @@ class ProductoForm(forms.ModelForm):
             'tallas': forms.TextInput(attrs={'class': 'form-control'}),
             'proveedor': forms.TextInput(attrs={'class': 'form-control'}),
         }
+        
+class SocioForm(forms.ModelForm):
+    class Meta:
+        model = Socio
+        fields = [
+            'DNISocio',
+            'nombreSocio',
+            'apellidosSocio',
+            'emailSocio',
+            'telefonoSocio',
+            'direccionSocio',
+            'fecha_nacSocio',
+        ]
+        widgets = {
+            'DNISocio': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombreSocio': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellidosSocio': forms.TextInput(attrs={'class': 'form-control'}),
+            'emailSocio': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telefonoSocio': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccionSocio': forms.TextInput(attrs={'class': 'form-control'}),
+            'fecha_nacSocio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+        
+class OrdenaForm(forms.Form):
+    producto_id = forms.CharField(max_length=13, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    cantidad = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        producto_id = cleaned_data.get("producto_id")
+        cantidad = cleaned_data.get("cantidad")
+
+        if producto_id and cantidad:
+            try:
+                producto = Producto.objects.get(ID_producto=producto_id)
+            except Producto.DoesNotExist:
+                raise forms.ValidationError("Producto no encontrado")
+
+            gasto = Gasto.objects.create(monto_gasto=producto.precio * cantidad)
+            Ordena.objects.create(id_gasto=gasto)

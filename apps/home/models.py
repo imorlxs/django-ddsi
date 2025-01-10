@@ -17,9 +17,6 @@ class Empleado(models.Model):
     emailEmpleado = models.CharField(max_length=40)
     direccionEmpleado = models.CharField(max_length=40)
     fecha_nacEmpleado = models.DateField()
-    motivo_bajaEmpleado = models.CharField(max_length=20, null=True, blank=True)
-    fecha_bajaEmpleado = models.DateField(null=True, blank=True)
-    contrasena = models.CharField(max_length=4)
 
     def _str_(self):
         return f'{self.nombreEmpleado} {self.apellidosEmpleado}'
@@ -33,9 +30,7 @@ class Socio(models.Model):
     emailSocio = models.CharField(max_length=40)
     telefonoSocio = models.CharField(max_length=9)
     direccionSocio = models.CharField(max_length=40)
-    fecha_nacSocio = models.DateField()
-    motivo_bajaSocio = models.CharField(max_length=60, null=True, blank=True)
-    fecha_bajaSocio = models.DateField(null=True, blank=True)
+    fecha_nacSocio = models.DateField(null=True, blank=True)
 
     def _str_(self):
         return f'{self.nombreSocio} {self.apellidosSocio}'

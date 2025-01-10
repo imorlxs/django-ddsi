@@ -12,8 +12,8 @@ from django.db.models import Sum
 from django.db.models import Q
 
 # Modelos DDSI
-from .models import Ingreso, Gasto, Campana, Empleado, Producto
-from .forms import IngresoForm, GastoForm, CampanaForm, EmpleadoForm, ProductoForm
+from .models import Ingreso, Gasto, Campana, Empleado, Producto, Socio, Ordena
+from .forms import IngresoForm, GastoForm, CampanaForm, EmpleadoForm, ProductoForm, SocioForm, OrdenaForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
@@ -259,7 +259,7 @@ def empleados_view(request):
         if request.method == 'POST':
             # Verify that the employee edit has been clicked
             if 'edit_empleado' in request.POST:
-                empleado_id = request.POST.get('empleado_id')
+                empleado_id = request.POST.get('DNIEmpleado')
                 if empleado_id:
                     # Get the corresponding employee
                     empleado = get_object_or_404(Empleado, DNIEmpleado=empleado_id)
@@ -297,10 +297,10 @@ def empleados_view(request):
     
     
 @login_required(login_url="/login/")
-def eliminar_empleado(request, id_empleado):
+def eliminar_empleado(request, DNIEmpleado):
     # Make sure the request is POST
     if request.method == 'POST':
-        empleado = get_object_or_404(Empleado, DNIEmpleado=id_empleado)
+        empleado = get_object_or_404(Empleado, DNIEmpleado=DNIEmpleado)
         empleado.delete()  # Delete the employee from the database
     
     return redirect('empleados')  # Redirects to the view of the employees
@@ -332,7 +332,7 @@ def productos_view(request):
                 return redirect('productos')  # Redirige a la misma página
         elif 'edit_producto' in request.POST:  # Si se pulsa el botón de Editar Producto
             # Obtener el id del producto desde el formulario POST
-            producto_id = request.POST.get('producto_id')  # El ID viene con el formulario
+            producto_id = request.POST.get('ID_producto')  # El ID viene con el formulario
             producto = get_object_or_404(Producto, ID_producto=producto_id)
             producto_form = ProductoForm(request.POST, instance=producto)
             if producto_form.is_valid():
@@ -354,10 +354,96 @@ def productos_view(request):
 
 #eliminar productos
 @login_required(login_url="/login/")
-def eliminar_producto(request, producto_id):
+def eliminar_producto(request, ID_producto):
     # Asegurarse de que la solicitud sea POST
     if request.method == 'POST':
-        producto = get_object_or_404(Producto, ID_producto=producto_id)  # Buscar el producto por su ID
+        producto = get_object_or_404(Producto, ID_producto=ID_producto)  # Buscar el producto por su ID
         producto.delete()  # Elimina el producto de la base de datos
 
     return redirect('productos')  # Redirige a la vista de productos
+
+@login_required(login_url="/login/")
+def socios_view(request):
+        # Search query
+        search_query = request.GET.get('search', '')
+        if search_query:
+            socios = Socio.objects.filter(DNISocio__icontains=search_query)
+        else:
+            socios = Socio.objects.all()
+    
+        context = {
+            'socios': socios,
+        }
+    
+        # Employee form management
+        socio_form = SocioForm()  # Always initialize the form at the beginning
+    
+        if request.method == 'POST':
+            # Verify that the employee edit has been clicked
+            if 'edit_socio' in request.POST:
+                socio_id = request.POST.get('DNISocio')
+                if socio_id:
+                    # Get the corresponding employee
+                    socio = get_object_or_404(Socio, DNISocio=socio_id)
+                    socio_form = SocioForm(request.POST, instance=socio)
+    
+                    # If the form is valid, we save the data
+                    if socio_form.is_valid():
+                        socio_form.save()
+                        messages.success(request, "¡Socio editado con éxito!")
+                        return redirect('socios')  # Redirects to the view of the employees
+                    else:
+                        # Add an error message if the form is invalid
+                        messages.error(request, "Hay algunos errores en el formulario.")
+                else:
+                    messages.error(request, "No se encontró el ID del socio.")
+            
+            # Verify that adding a new employee has been clicked
+            elif 'add_socio' in request.POST:
+                socio_form = SocioForm(request.POST)  # Create a new form with the submitted data
+    
+                # If the form is valid, we save the data
+                if socio_form.is_valid():
+                    socio_form.save()
+                    messages.success(request, "¡Nuevo socio agregado exitosamente!")
+                    return redirect('socios')  # Redirects to the view of the employees
+                else:
+                    # Add an error message if the form is invalid
+                    messages.error(request, "Hay algunos errores en el formulario.")
+    
+        context['socio_form'] = socio_form
+    
+        # Template path
+        html_template = loader.get_template('home/socios.html')  
+        return HttpResponse(html_template.render(context, request))
+    
+    
+@login_required(login_url="/login/")
+def eliminar_socio(request, DNISocio):
+    # Make sure the request is POST
+    if request.method == 'POST':
+        socio = get_object_or_404(Socio, DNISocio=DNISocio)
+        socio.delete()  # Delete the employee from the database
+    
+    return redirect('socios')  # Redirects to the view of the employees
+
+
+@login_required(login_url="/login/")
+def ordenar_view(request):
+    if request.method == 'POST':
+        form = OrdenaForm(request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            producto_id = cleaned_data.get('producto_id')
+            cantidad = cleaned_data.get('cantidad')
+            try:
+                producto = Producto.objects.get(ID_producto=producto_id)
+                gasto = Gasto.objects.create(monto_gasto=producto.precio * cantidad)
+                Ordena.objects.create(id_producto=producto, id_gasto=gasto, cantidad=cantidad)
+                messages.success(request, "Orden creada exitosamente.")
+            except Producto.DoesNotExist:
+                messages.error(request, "Producto no encontrado.")
+            return redirect('ordenar')
+    else:
+        form = OrdenaForm()
+    return render(request, 'home/ordenar.html', {'form': form})
