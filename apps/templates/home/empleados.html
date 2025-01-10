@@ -113,7 +113,7 @@
           </div>
           <div class="modal-body">
             {{ empleado_form }}
-            <input type="hidden" id="empleado_id" name="empleado_id" value="">
+            <input type="hidden" id="DNIEmpleado" name="DNIEmpleado" value="">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -136,7 +136,7 @@
     var idEmpleado = $(this).data('id');
     
     // Asignar el valor al campo oculto del formulario
-    $('#empleado_id').val(idEmpleado);
+    $('#DNIEmpleado').val(idEmpleado);
     
     // Opcional: Si quieres llenar otros campos del formulario, también puedes hacerlo
     // $('#montoEmpleado').val(someValue);

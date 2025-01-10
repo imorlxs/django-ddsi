@@ -304,3 +304,60 @@ def eliminar_empleado(request, id_empleado):
         empleado.delete()  # Delete the employee from the database
     
     return redirect('empleados')  # Redirects to the view of the employees
+
+
+@login_required(login_url="/login/")
+def productos_view(request):
+    # BUSCAR PRODUCTOS
+    search_query = request.GET.get('search', '')
+    if search_query:
+        productos = Producto.objects.filter(ID_producto__icontains=search_query)
+    else:
+        productos = Producto.objects.all()
+
+    # Productos con cantidad = 0 para el aviso de restock
+    productos_sin_stock = Producto.objects.filter(cantidad=0)
+
+    context = {
+        'productos': productos,
+        'productos_sin_stock': productos_sin_stock,  # Añadido al contexto
+    }
+
+    # Manejo de formularios para añadir y editar productos
+    if request.method == 'POST':
+        if 'add_producto' in request.POST:  # Si se pulsa el botón de Añadir Producto
+            producto_form = ProductoForm(request.POST)
+            if producto_form.is_valid():
+                producto_form.save()
+                return redirect('productos')  # Redirige a la misma página
+        elif 'edit_producto' in request.POST:  # Si se pulsa el botón de Editar Producto
+            # Obtener el id del producto desde el formulario POST
+            producto_id = request.POST.get('producto_id')  # El ID viene con el formulario
+            producto = get_object_or_404(Producto, ID_producto=producto_id)
+            producto_form = ProductoForm(request.POST, instance=producto)
+            if producto_form.is_valid():
+                producto_form.save()
+                return redirect('productos')  # Redirige a la misma página
+    else:
+        producto_form = ProductoForm()
+
+    # Si estamos editando un producto, obtenemos ese producto
+    producto_id = request.GET.get('edit', None)
+    if producto_id:
+        producto = get_object_or_404(Producto, ID_producto=producto_id)
+        producto_form = ProductoForm(instance=producto)
+
+    context['producto_form'] = producto_form
+
+    html_template = loader.get_template('home/productos.html')
+    return HttpResponse(html_template.render(context, request))
+
+#eliminar productos
+@login_required(login_url="/login/")
+def eliminar_producto(request, producto_id):
+    # Asegurarse de que la solicitud sea POST
+    if request.method == 'POST':
+        producto = get_object_or_404(Producto, ID_producto=producto_id)  # Buscar el producto por su ID
+        producto.delete()  # Elimina el producto de la base de datos
+
+    return redirect('productos')  # Redirige a la vista de productos
