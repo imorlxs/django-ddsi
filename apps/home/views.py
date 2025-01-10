@@ -12,13 +12,10 @@ from django.db.models import Sum
 from django.db.models import Q
 
 # Modelos DDSI
-from .models import Ingreso  
-from .models import Gasto 
-from .forms import IngresoForm, GastoForm
+from .models import Ingreso, Gasto, Campana, Empleado, Producto
+from .forms import IngresoForm, GastoForm, CampanaForm, EmpleadoForm, ProductoForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Campana
-from .forms import CampanaForm
 
 
 def contabilidad_view(request):
@@ -241,3 +238,69 @@ def eliminar_campana(request, id_campana):
         campana.delete()  # Delete the campaign from the database
 
     return redirect('campanas')  # redirects to the view of the campaign 
+
+
+@login_required(login_url="/login/")
+def empleados_view(request):
+        # Search query
+        search_query = request.GET.get('search', '')
+        if search_query:
+            empleados = Empleado.objects.filter(DNIEmpleado__icontains=search_query)
+        else:
+            empleados = Empleado.objects.all()
+    
+        context = {
+            'empleados': empleados,
+        }
+    
+        # Employee form management
+        empleado_form = EmpleadoForm()  # Always initialize the form at the beginning
+    
+        if request.method == 'POST':
+            # Verify that the employee edit has been clicked
+            if 'edit_empleado' in request.POST:
+                empleado_id = request.POST.get('empleado_id')
+                if empleado_id:
+                    # Get the corresponding employee
+                    empleado = get_object_or_404(Empleado, DNIEmpleado=empleado_id)
+                    empleado_form = EmpleadoForm(request.POST, instance=empleado)
+    
+                    # If the form is valid, we save the data
+                    if empleado_form.is_valid():
+                        empleado_form.save()
+                        messages.success(request, "¡Empleado editado con éxito!")
+                        return redirect('empleados')  # Redirects to the view of the employees
+                    else:
+                        # Add an error message if the form is invalid
+                        messages.error(request, "Hay algunos errores en el formulario.")
+                else:
+                    messages.error(request, "No se encontró el ID del empleado.")
+            
+            # Verify that adding a new employee has been clicked
+            elif 'add_empleado' in request.POST:
+                empleado_form = EmpleadoForm(request.POST)  # Create a new form with the submitted data
+    
+                # If the form is valid, we save the data
+                if empleado_form.is_valid():
+                    empleado_form.save()
+                    messages.success(request, "¡Nuevo empleado agregado exitosamente!")
+                    return redirect('empleados')  # Redirects to the view of the employees
+                else:
+                    # Add an error message if the form is invalid
+                    messages.error(request, "Hay algunos errores en el formulario.")
+    
+        context['empleado_form'] = empleado_form
+    
+        # Template path
+        html_template = loader.get_template('home/empleados.html')  
+        return HttpResponse(html_template.render(context, request))
+    
+    
+@login_required(login_url="/login/")
+def eliminar_empleado(request, id_empleado):
+    # Make sure the request is POST
+    if request.method == 'POST':
+        empleado = get_object_or_404(Empleado, DNIEmpleado=id_empleado)
+        empleado.delete()  # Delete the employee from the database
+    
+    return redirect('empleados')  # Redirects to the view of the employees

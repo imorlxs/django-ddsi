@@ -21,8 +21,13 @@ urlpatterns = [
     
     path('campanas', views.campanas_view, name='campanas'),  # Vista principal de campañas
     path('eliminar_campana/<int:id_campana>/', views.eliminar_campana, name='eliminar_campana'),  # Eliminar campaña
-    #path('editar_campana/<int:campana_id>/', views.editar_campana, name='editar_campana'),  # Editar campaña
 
+    path('empleados', views.empleados_view, name='empleados'),  # Vista principal de empleados
+    path('eliminar_empleado/<str:DNIEmpleado>/', views.eliminar_empleado, name='eliminar_empleado'),  # Eliminar empleado
+    
+    #productos
+    path('productos', views.productos_view, name='productos'),
+    path('eliminar_producto/<str:ID_producto>/', views.eliminar_producto, name='eliminar_producto'),
     
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
