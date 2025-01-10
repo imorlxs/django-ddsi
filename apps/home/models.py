@@ -44,8 +44,7 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     tallas = models.CharField(max_length=60)
     proveedor = models.CharField(max_length=24)
-    avisar_restock = models.BooleanField(default=False)  # Indica si el producto necesita restock
-    
+        
     def _str_(self):
         return self.nombre_producto
 

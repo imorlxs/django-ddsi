@@ -69,7 +69,6 @@ CREATE TABLE IF NOT EXISTS "home_producto" (
 	"precio"	decimal NOT NULL,
 	"tallas"	varchar(60) NOT NULL,
 	"proveedor"	varchar(24) NOT NULL,
-	"avisar_restock"	bool NOT NULL,
 	PRIMARY KEY("ID_producto")
 );
 CREATE TABLE IF NOT EXISTS "home_socio" (
