@@ -476,7 +476,7 @@ def compras_view(request):
     # BUSCAR COMPRAS
     search_query = request.GET.get('search', '')
     if search_query:
-        compras = Compra.objects.filter(id_compra__icontains=search_query)
+        compras = Compra.objects.filter(id_ingreso__icontains=search_query)
     else:
         compras = Compra.objects.all()
     context = {
@@ -499,9 +499,9 @@ def compras_view(request):
 
 
 @login_required(login_url="/login/")
-def eliminar_compra(request, id_compra):
+def eliminar_compra(request, id_ingreso):
     # Asegurarse de que la solicitud sea POST
     if request.method == 'POST':
-        compra = get_object_or_404(Compra, id_compra=id_compra)
+        compra = get_object_or_404(Compra, id_ingreso=id_ingreso)
         compra.delete()  # Elimina la compra de la base de datos
     return redirect('compras')  # Redirige a la vista de compras

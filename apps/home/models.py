@@ -89,6 +89,7 @@ class Campana(models.Model):
 class Genera(models.Model):
     id_campana = models.ForeignKey(Campana, on_delete=models.CASCADE)
     id_gasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
+    fecha_genera = models.DateField()
 
     class Meta:
         unique_together = ('id_campana', 'id_gasto')
@@ -97,6 +98,7 @@ class Genera(models.Model):
 # Ordena
 class Ordena(models.Model):
     id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
     id_gasto = models.ForeignKey(Gasto, on_delete=models.CASCADE)
     cantidad = models.IntegerField()
     fecha_gasto = models.DateField()
@@ -120,9 +122,10 @@ class Compra(models.Model):
     dnisocio = models.ForeignKey(Socio, on_delete=models.CASCADE)
     fecha_compra = models.DateField()
     cantidad = models.IntegerField()
-
     
-
-    class Meta:
-        unique_together = ('id_producto', 'dnisocio')
-
+    def delete(self, *args, **kwargs):
+        producto = self.id_producto
+        producto.cantidad += self.cantidad
+        producto.save()
+        self.id_ingreso.delete()
+        super().delete(*args, **kwargs)

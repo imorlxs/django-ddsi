@@ -44,11 +44,11 @@
             {% for compra in compras %}
             <tr>
               <td class="text-center">{{ compra.id_producto.ID_producto }}</td>
-              <td class="text-center">{{ compra.id_gasto.id_gasto }}</td>
+              <td class="text-center">{{ compra.ingreso.ingreso }}</td>
               <td>{{ compra.cantidad }}</td>
-              <td>{{ compra.hora_gasto }}</td>
+              <td>{{ compra.fecha_compra }}</td>
               <td class="td-actions text-right">
-                <form action="{% url 'eliminar_compra' compra.id_gasto.id_gasto %}" method="post" style="display:inline;">
+                <form action="{% url 'eliminar_compra' compra.id_ingreso.id_ingreso %}" method="post" style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-danger btn-round">
                     <i class="material-icons">close</i>

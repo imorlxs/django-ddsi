@@ -36,7 +36,7 @@ urlpatterns = [
     path('eliminar_ordena/<str:id_gasto>/', views.eliminar_ordena, name='eliminar_ordena'),
     
     path('compras', views.compras_view, name='compras'),
-    path('eliminar_compra/<int:id_compra>/', views.eliminar_compra, name='eliminar_compra'),
+    path('eliminar_compra/<str:id_ingreso>/', views.eliminar_compra, name='eliminar_compra'),
     
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
