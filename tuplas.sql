@@ -88,12 +88,12 @@ INSERT INTO "home_ordena" VALUES (1,3,'2025-01-10','2025-01-10 05:20:38.237579',
  
 INSERT INTO "home_producto" VALUES ('0012345678901','Camiseta',91,15.99,'S,M,L,XL','Proveedor1'),
  ('0023456789012','Pantalones',171,25.5,'M,L,XL','Proveedor2'),
- ('0034567890123','Zapatos',-99,45,'39,40,41,42,43','Proveedor3'),
+ ('0034567890123','Zapatos',99,45,'39,40,41,42,43','Proveedor3'),
  ('0045678901234','Chaqueta',25,55.9,'M,L','Proveedor4'),
  ('0056789012345','Sombrero',35,12.75,'Única','Proveedor5'),
  ('0067890123456','Guantes',23,9.99,'S,M,L','Proveedor1'),
  ('0078901234567','Bufanda',83,7.5,'Única','Proveedor3'),
- ('0089012345678','Corbata',-2,18.2,'Única','Proveedor2'),
+ ('0089012345678','Corbata',2,18.2,'Única','Proveedor2'),
  ('0090123456789','Gorra',82,11.4,'Única','Proveedor4'),
  ('0101234567890','Cinturón',4,21.99,'M,L','Proveedor5');
  
